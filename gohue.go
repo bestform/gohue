@@ -27,6 +27,7 @@ type Client struct {
 type State struct {
 	Hue, Brightness, Saturation int
 	On                          bool
+	Xy                          []float64
 }
 
 // NewClient returns a pointer to a new Client. This instance does not connect to your network, yet.
@@ -66,6 +67,7 @@ func (c *Client) Connect() error {
 		light.State.Saturation = jsonLight.Sat
 		light.State.On = jsonLight.On
 		light.name = jsonLight.Name
+		light.State.Xy = jsonLight.Xy
 		light.client = c
 
 		c.Lights = append(c.Lights, *light)
@@ -77,15 +79,15 @@ func (c *Client) Connect() error {
 func newLight(id string) *Light {
 	l := Light{}
 	l.id = id
-	l.State = State{10000, 254, 254, true}
+	l.State = State{10000, 254, 254, true, []float64{0.0, 0.0}}
 
 	return &l
 }
 
 // UpdateState sends the current state of the light to its hardware counterpart.
-func (light *Light) UpdateState() error {
+func (light *Light) UpdateState(useXY bool) error {
 	url := getAPIBaseURL(light.client.ip, light.client.username) + "lights/" + light.id + "/state"
-	payload := getPayloadFromState(light.State)
+	payload := getPayloadFromState(light.State, useXY)
 	payloadReader := strings.NewReader(payload)
 	req, err := http.NewRequest("PUT", url, payloadReader)
 	if err != nil {
@@ -101,12 +103,20 @@ func getAPIBaseURL(ip, username string) string {
 	return "http://" + ip + "/api/" + username + "/"
 }
 
-func getPayloadFromState(s State) string {
+func getPayloadFromState(s State, useXY bool) string {
 	var onState string
 	if s.On {
 		onState = "true"
 	} else {
 		onState = "false"
 	}
-	return "{\"on\":" + onState + ", \"sat\":" + strconv.Itoa(s.Saturation) + ", \"bri\":" + strconv.Itoa(s.Brightness) + ",\"hue\":" + strconv.Itoa(s.Hue) + "}"
+	var colorValue string
+	if useXY {
+		x := strconv.FormatFloat(s.Xy[0], 'f', 4, 64)
+		y := strconv.FormatFloat(s.Xy[1], 'f', 4, 64)
+		colorValue = "\"xy\":[" + x + "," + y + "]"
+	} else {
+		colorValue = "\"hue\":" + strconv.Itoa(s.Hue)
+	}
+	return "{\"on\":" + onState + ", \"sat\":" + strconv.Itoa(s.Saturation) + ", \"bri\":" + strconv.Itoa(s.Brightness) + "," + colorValue + "}"
 }
