@@ -14,8 +14,11 @@ func Example() {
 	}
 
 	for _, light := range client.Lights {
-		light.State.Hue = 10000
-		err := light.UpdateState()
+		err := light.SwitchOn()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = light.SetColorRGB(110, 110, 210)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -46,12 +46,12 @@ func (c *Client) Connect() error {
 
 	for id, jsonLight := range jsonResponse {
 		light := newLight(id)
-		light.State.Brightness = jsonLight.Bri
-		light.State.Hue = jsonLight.Hue
-		light.State.Saturation = jsonLight.Sat
-		light.State.On = jsonLight.On
+		light.state.Brightness = jsonLight.Bri
+		light.state.Hue = jsonLight.Hue
+		light.state.Saturation = jsonLight.Sat
+		light.state.On = jsonLight.On
 		light.name = jsonLight.Name
-		light.State.Xy = jsonLight.Xy
+		light.state.Xy = jsonLight.Xy
 		light.client = c
 
 		c.Lights = append(c.Lights, *light)
@@ -64,20 +64,28 @@ func getAPIBaseURL(ip, username string) string {
 	return "http://" + ip + "/api/" + username + "/"
 }
 
-func getPayloadFromState(s State, useXY bool) string {
-	var onState string
-	if s.On {
-		onState = "true"
-	} else {
-		onState = "false"
-	}
-	var colorValue string
-	if useXY {
+func getPayloadFromState(s State, uType updateType) string {
+	var payload string
+	switch uType {
+	case COLOR_HUE:
+		payload = "{\"hue\":" + strconv.Itoa(s.Hue) + "}"
+	case COLOR_XY:
 		x := strconv.FormatFloat(s.Xy[0], 'f', 4, 64)
 		y := strconv.FormatFloat(s.Xy[1], 'f', 4, 64)
-		colorValue = "\"xy\":[" + x + "," + y + "]"
-	} else {
-		colorValue = "\"hue\":" + strconv.Itoa(s.Hue)
+		payload = "{\"xy\":[" + x + "," + y + "]}"
+	case BRIGHTNESS:
+		payload = "{\"bri\":" + strconv.Itoa(s.Brightness) + "}"
+	case SATURATION:
+		payload = "{\"sat\":" + strconv.Itoa(s.Saturation) + "}"
+	case ONOFF:
+		var onState string
+		if s.On {
+			onState = "true"
+		} else {
+			onState = "false"
+		}
+		payload = "{\"on\":" + onState + "}"
 	}
-	return "{\"on\":" + onState + ", \"sat\":" + strconv.Itoa(s.Saturation) + ", \"bri\":" + strconv.Itoa(s.Brightness) + "," + colorValue + "}"
+
+	return payload
 }
