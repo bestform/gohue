@@ -64,7 +64,7 @@ func getAPIBaseURL(ip, username string) string {
 	return "http://" + ip + "/api/" + username + "/"
 }
 
-func getPayloadFromState(s State, uType updateType) string {
+func getPayloadFromState(s state, uType updateType) string {
 	var payload string
 	switch uType {
 	case updateColorHue:

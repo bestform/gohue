@@ -19,12 +19,12 @@ const (
 type Light struct {
 	id     string
 	name   string
-	state  State
+	state  state
 	client *Client
 }
 
 // State represents the current or desired state of a light
-type State struct {
+type state struct {
 	Hue, Brightness, Saturation int
 	On                          bool
 	Xy                          []float64
@@ -33,7 +33,7 @@ type State struct {
 func newLight(id string) *Light {
 	l := Light{}
 	l.id = id
-	l.state = State{10000, 254, 254, true, []float64{0.0, 0.0}}
+	l.state = state{10000, 254, 254, true, []float64{0.0, 0.0}}
 
 	return &l
 }
