@@ -46,7 +46,7 @@ func (l *Light) SetColorHue(hue int) error {
 
 // SetColorRGB converts the given RGB values to the corresponding x/y values and sets the color based on those. It has an immediate effect.
 func (l *Light) SetColorRGB(r, g, b int) error {
-	x, y := ConvertRGBToXY(r, g, b)
+	x, y := convertRGBToXY(r, g, b)
 	l.state.Xy[0] = x
 	l.state.Xy[1] = y
 	return l.updateState(updateColorXy)

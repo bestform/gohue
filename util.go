@@ -2,7 +2,7 @@ package gohue
 
 import "math"
 
-func ConvertRGBToXY(r, g, b int) (float64, float64) {
+func convertRGBToXY(r, g, b int) (float64, float64) {
 	red := float64(r) / 255.0
 	green := float64(g) / 255.0
 	blue := float64(b) / 255.0
