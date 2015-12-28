@@ -8,11 +8,11 @@ import (
 type updateType int
 
 const (
-	COLOR_HUE updateType = iota
-	COLOR_XY
-	BRIGHTNESS
-	ONOFF
-	SATURATION
+	updateColorHue updateType = iota
+	updateColorXy
+	updateBrightness
+	updateOnOff
+	updateSaturation
 )
 
 // Light represents one light in the network of a Client.
@@ -41,7 +41,7 @@ func newLight(id string) *Light {
 // SetColorHue sets the hue value. It has an immediate effect.
 func (l *Light) SetColorHue(hue int) error {
 	l.state.Hue = hue
-	return l.updateState(COLOR_HUE)
+	return l.updateState(updateColorHue)
 }
 
 // SetColorRGB converts the given RGB values to the corresponding x/y values and sets the color based on those. It has an immediate effect.
@@ -49,31 +49,31 @@ func (l *Light) SetColorRGB(r, g, b int) error {
 	x, y := ConvertRGBToXY(r, g, b)
 	l.state.Xy[0] = x
 	l.state.Xy[1] = y
-	return l.updateState(COLOR_XY)
+	return l.updateState(updateColorXy)
 }
 
 // SetBrightness sets the brightness value. It has an immediate effect.
 func (l *Light) SetBrightness(bri int) error {
 	l.state.Brightness = bri
-	return l.updateState(BRIGHTNESS)
+	return l.updateState(updateBrightness)
 }
 
 // SetSaturation sets the saturation value. It has an immediate effect.
 func (l *Light) SetSaturation(sat int) error {
 	l.state.Saturation = sat
-	return l.updateState(SATURATION)
+	return l.updateState(updateSaturation)
 }
 
 // SwitchOn sets the on state to true. It has an immediate effect.
 func (l *Light) SwitchOn() error {
 	l.state.On = true
-	return l.updateState(ONOFF)
+	return l.updateState(updateOnOff)
 }
 
 // SwitchOff sets the on state to false. It has an immediate effect.
 func (l *Light) SwitchOff() error {
 	l.state.On = false
-	return l.updateState(ONOFF)
+	return l.updateState(updateOnOff)
 }
 
 // UpdateState sends the current state of the light to its hardware counterpart.

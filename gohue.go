@@ -67,17 +67,17 @@ func getAPIBaseURL(ip, username string) string {
 func getPayloadFromState(s State, uType updateType) string {
 	var payload string
 	switch uType {
-	case COLOR_HUE:
+	case updateColorHue:
 		payload = "{\"hue\":" + strconv.Itoa(s.Hue) + "}"
-	case COLOR_XY:
+	case updateColorXy:
 		x := strconv.FormatFloat(s.Xy[0], 'f', 4, 64)
 		y := strconv.FormatFloat(s.Xy[1], 'f', 4, 64)
 		payload = "{\"xy\":[" + x + "," + y + "]}"
-	case BRIGHTNESS:
+	case updateBrightness:
 		payload = "{\"bri\":" + strconv.Itoa(s.Brightness) + "}"
-	case SATURATION:
+	case updateSaturation:
 		payload = "{\"sat\":" + strconv.Itoa(s.Saturation) + "}"
-	case ONOFF:
+	case updateOnOff:
 		var onState string
 		if s.On {
 			onState = "true"
