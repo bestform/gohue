@@ -2,6 +2,7 @@ package gohue
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -89,4 +90,30 @@ func (light *Light) updateState(uType updateType) error {
 	client.Do(req)
 
 	return nil
+}
+
+func getPayloadFromState(s state, uType updateType) string {
+	var payload string
+	switch uType {
+	case updateColorHue:
+		payload = "{\"hue\":" + strconv.Itoa(s.Hue) + "}"
+	case updateColorXy:
+		x := strconv.FormatFloat(s.Xy[0], 'f', 4, 64)
+		y := strconv.FormatFloat(s.Xy[1], 'f', 4, 64)
+		payload = "{\"xy\":[" + x + "," + y + "]}"
+	case updateBrightness:
+		payload = "{\"bri\":" + strconv.Itoa(s.Brightness) + "}"
+	case updateSaturation:
+		payload = "{\"sat\":" + strconv.Itoa(s.Saturation) + "}"
+	case updateOnOff:
+		var onState string
+		if s.On {
+			onState = "true"
+		} else {
+			onState = "false"
+		}
+		payload = "{\"on\":" + onState + "}"
+	}
+
+	return payload
 }
