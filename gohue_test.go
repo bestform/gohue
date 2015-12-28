@@ -7,7 +7,7 @@ import (
 )
 
 func Example() {
-	client := gohue.NewClient("<Your API Username>", "<You API IP Address")
+	client := gohue.NewClient("<Your API Username>", "<Your API IP Address")
 	err := client.Connect()
 	if err != nil {
 		log.Fatal(err)
