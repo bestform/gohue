@@ -14,6 +14,24 @@ const (
 	updateBrightness
 	updateOnOff
 	updateSaturation
+	updateEffect
+	updateAlert
+)
+
+// Effect represents an effect type used by SetEffect()
+type Effect string
+
+const (
+	EffectNone      Effect = "none"
+	EffectColorloop Effect = "colorloop"
+)
+
+// Alert represents an effect type used by SetAlert()
+type Alert string
+
+const (
+	AlertNone   Alert = "none"
+	AlertSelect Alert = "select"
 )
 
 // Light represents one light in the network of a Client.
@@ -29,12 +47,14 @@ type state struct {
 	Hue, Brightness, Saturation int
 	On                          bool
 	Xy                          []float64
+	Effect                      string
+	Alert                       string
 }
 
 func newLight(id string) *Light {
 	l := Light{}
 	l.id = id
-	l.state = state{10000, 254, 254, true, []float64{0.0, 0.0}}
+	l.state = state{10000, 254, 254, true, []float64{0.0, 0.0}, "none", "none"}
 
 	return &l
 }
@@ -77,6 +97,18 @@ func (l *Light) SwitchOff() error {
 	return l.updateState(updateOnOff)
 }
 
+// SetEffect sets the effect value to one of the possible Effect constants. It has an immediate effect.
+func (l *Light) SetEffect(e Effect) error {
+	l.state.Effect = string(e)
+	return l.updateState(updateEffect)
+}
+
+// SetAlert sets the alert value to one of the possible Alert constants. It has an immediate effect.
+func (l *Light) SetAlert(a Alert) error {
+	l.state.Alert = string(a)
+	return l.updateState(updateAlert)
+}
+
 // UpdateState sends the current state of the light to its hardware counterpart.
 func (light *Light) updateState(uType updateType) error {
 	url := getAPIBaseURL(light.client.ip, light.client.username) + "lights/" + light.id + "/state"
@@ -113,6 +145,10 @@ func getPayloadFromState(s state, uType updateType) string {
 			onState = "false"
 		}
 		payload = "{\"on\":" + onState + "}"
+	case updateEffect:
+		payload = "{\"effect\": \"" + s.Effect + "\"}"
+	case updateAlert:
+		payload = "{\"alert\": \"" + s.Alert + "\"}"
 	}
 
 	return payload

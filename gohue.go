@@ -52,6 +52,8 @@ func (c *Client) Connect() error {
 		light.name = jsonLight.Name
 		light.state.Xy = jsonLight.Xy
 		light.client = c
+		light.state.Effect = jsonLight.Effect
+		light.state.Alert = jsonLight.Alert
 
 		c.Lights = append(c.Lights, *light)
 	}
