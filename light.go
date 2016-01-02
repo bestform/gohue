@@ -39,7 +39,7 @@ type Light struct {
 	id     string
 	name   string
 	state  state
-	client *Client
+	client *client
 }
 
 // State represents the current or desired state of a light

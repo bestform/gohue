@@ -8,24 +8,33 @@ import (
 )
 
 // Client represents the interface to the network of Hue devices
-type Client struct {
+type Client interface {
+	Connect() error
+	GetLights() []Light
+}
+
+type client struct {
 	username, ip string
-	Lights       []Light
+	lights       []Light
 }
 
 // NewClient returns a pointer to a new Client. This instance does not connect to your network, yet.
 // To fetch all available lights, call Connect() on the returned instance
-func NewClient(username, ip string) *Client {
-	c := Client{}
+func NewClient(username, ip string) Client {
+	c := client{}
 	c.ip = ip
 	c.username = username
-	c.Lights = make([]Light, 0)
+	c.lights = make([]Light, 0)
 
 	return &c
 }
 
+func (c client) GetLights() []Light {
+	return c.lights
+}
+
 // Connect fetches all available lights in the network and stores them inside the Clients Lights list
-func (c *Client) Connect() error {
+func (c *client) Connect() error {
 	url := getAPIBaseURL(c.ip, c.username) + "lights"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -55,7 +64,7 @@ func (c *Client) Connect() error {
 		light.state.Effect = jsonLight.Effect
 		light.state.Alert = jsonLight.Alert
 
-		c.Lights = append(c.Lights, *light)
+		c.lights = append(c.lights, *light)
 	}
 
 	return nil

@@ -13,7 +13,7 @@ func Example() {
 		log.Fatal(err)
 	}
 
-	for _, light := range client.Lights {
+	for _, light := range client.GetLights() {
 		err := light.SwitchOn()
 		if err != nil {
 			log.Fatal(err)
